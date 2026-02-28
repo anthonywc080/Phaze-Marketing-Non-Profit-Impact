@@ -1,0 +1,9 @@
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+# This rule ensures that your React Single Page Application handles routing correctly on Netlify
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
