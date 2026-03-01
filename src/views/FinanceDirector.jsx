@@ -100,7 +100,23 @@ export default function FinanceDirector(){
         </div>
 
         <div className="space-y-4">
-          <DonationWidget initial={donations} onNewDonation={handleNewDonation} />
+          <DonationWidget items={donations} onNewDonation={handleNewDonation} />
+          <div className="mt-4">
+            <h4 className="text-sm font-semibold mb-2">Audit Log</h4>
+            <div className="space-y-2">
+              {/* Inline timeline */}
+              {donations.slice(0,8).map(d => (
+                <div key={d.id} className="flex items-center justify-between p-2 bg-white rounded-lg border">
+                  <div className="flex items-center gap-3">
+                    <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                    <div className="text-sm">{d.donor} donated <span className="font-semibold text-emerald-600">${d.amount}</span></div>
+                  </div>
+                  <div className="text-xs text-slate-500">{d.time || d.timestamp}</div>
+                </div>
+              ))}
+              {donations.length === 0 && <div className="text-sm text-slate-500">No donation events</div>}
+            </div>
+          </div>
         </div>
       </div>
     </div>
