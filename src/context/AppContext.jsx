@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import { listenDonations } from '../firebase/firestore'
 import { v4 as uuidv4 } from 'uuid'
 
 const AppContext = createContext(null)
@@ -20,6 +21,17 @@ export function AppProvider({ children }) {
   const [donations, setDonations] = useState([
     { id: uuidv4(), donorName: 'Heights Philanthropy', amount: 500, campaign: 'Tech Equity', timestamp: now() }
   ])
+
+  useEffect(() => {
+    const useFirestore = Boolean(import.meta.env.VITE_FIREBASE_PROJECT_ID)
+    if (!useFirestore) return
+    const unsub = listenDonations((items) => {
+      // map docs into expected donation shape
+      const mapped = items.map(i => ({ id: i.id, donorName: i.donorName || i.donor || 'Donor', amount: i.amount || 0, campaign: i.campaign || i.campaignName || '', timestamp: i.timestamp || i.time || now() }))
+      setDonations(mapped)
+    })
+    return unsub
+  }, [])
 
   function addTask(task) {
     setTasks((t) => [{ id: uuidv4(), date: now(), ...task }, ...t])
