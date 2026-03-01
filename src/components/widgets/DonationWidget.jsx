@@ -3,9 +3,10 @@ import Button from '../ui/Button'
 import { useToast } from '../../context/ToastContext'
 import { listenDonations, addDonation as addDonationToFS } from '../../firebase/firestore'
 
-export default function DonationWidget({ initial = [] }) {
+export default function DonationWidget({ initial = [], onNewDonation }) {
   const [donations, setDonations] = useState(initial)
   const { showToast } = useToast()
+  const [loading, setLoading] = useState(false)
   const useFirestore = Boolean(import.meta.env.VITE_FIREBASE_PROJECT_ID)
 
   useEffect(() => {
@@ -20,17 +21,26 @@ export default function DonationWidget({ initial = [] }) {
   const total = donations.reduce((s, d) => s + d.amount, 0)
 
   async function refresh() {
+    setLoading(true)
     const newDonation = { donor: 'New Donor', amount: Math.floor(Math.random() * 500) + 5, time: new Date().toLocaleTimeString() }
+    await new Promise((r) => setTimeout(r, 1500))
     if (useFirestore) {
       try {
         await addDonationToFS(newDonation)
+        setLoading(false)
+        if (typeof onNewDonation === 'function') onNewDonation(newDonation)
         showToast('Donation Synced!', 'success')
         return
       } catch (e) {
+        setLoading(false)
         showToast('Failed to sync donation', 'danger')
+        return
       }
     }
-    setDonations((d) => [{ id: Date.now(), ...newDonation }, ...d])
+    const created = { id: Date.now(), ...newDonation }
+    setDonations((d) => [created, ...d])
+    if (typeof onNewDonation === 'function') onNewDonation(created)
+    setLoading(false)
     showToast('Donation Synced!', 'success')
   }
 
@@ -40,7 +50,7 @@ export default function DonationWidget({ initial = [] }) {
         <h4 className="font-semibold">Live Donation Feed</h4>
         <div className="flex items-center gap-2">
           <div className="text-sm text-slate-500">Total: <span className="font-semibold">${total}</span></div>
-          <Button variant="ghost" onClick={refresh}>Refresh</Button>
+          <Button variant="ghost" loading={loading} onClick={refresh}>Refresh</Button>
         </div>
       </div>
       <div className="space-y-2 max-h-40 overflow-y-auto">

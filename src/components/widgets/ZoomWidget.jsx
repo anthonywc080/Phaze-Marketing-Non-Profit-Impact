@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Button from '../ui/Button'
 import { useToast } from '../../context/ToastContext'
 
 export default function ZoomWidget({ sessions = [] }) {
   const { showToast } = useToast()
+  const [loadingId, setLoadingId] = useState(null)
 
   return (
     <div className="bg-white rounded-2xl p-4 shadow-sm">
@@ -15,7 +16,13 @@ export default function ZoomWidget({ sessions = [] }) {
               <div className="font-medium">{s.title}</div>
               <div className="text-xs text-slate-500">{s.time}</div>
             </div>
-            <Button variant="primary" onClick={() => showToast('Opening Zoom...')}>Start Meeting</Button>
+            <Button variant="primary" loading={loadingId === s.id} onClick={() => {
+              setLoadingId(s.id)
+              setTimeout(() => {
+                setLoadingId(null)
+                showToast('Meeting started', 'success')
+              }, 1200)
+            }}>Start Meeting</Button>
           </div>
         ))}
         {sessions.length === 0 && <div className="text-sm text-slate-500">No sessions scheduled.</div>}

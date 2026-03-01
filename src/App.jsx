@@ -1,6 +1,7 @@
 import React from 'react'
 import { ToastProvider } from './context/ToastContext'
 import { RoleProvider, useRole } from './context/RoleContext'
+import { AppProvider } from './context/AppContext'
 import { FirebaseProvider } from './context/FirebaseContext'
 import Button from './components/ui/Button'
 
@@ -74,12 +75,14 @@ export default function App(){
   return (
     <ToastProvider>
       <FirebaseProvider>
-        <RoleProvider>
-          <div className="min-h-screen bg-slate-50 font-sans">
-            <TopNav />
-            <PersonaShell />
-          </div>
-        </RoleProvider>
+        <AppProvider>
+          <RoleProvider>
+            <div className="min-h-screen bg-slate-50 font-sans">
+              <TopNav />
+              <PersonaShell />
+            </div>
+          </RoleProvider>
+        </AppProvider>
       </FirebaseProvider>
     </ToastProvider>
   )
