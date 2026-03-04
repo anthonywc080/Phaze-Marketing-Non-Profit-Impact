@@ -98,7 +98,7 @@ import React, { useState } from 'react'
 import { useToast } from '../context/ToastContext'
 import ZoomWidget from '../components/widgets/ZoomWidget'
 import GmailWidget from '../components/widgets/GmailWidget'
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
 export default function NonprofitOps() {
   const [sessions] = useState([

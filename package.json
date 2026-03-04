@@ -8,26 +8,28 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "vite",
-    "seed:firestore": "node scripts/seedFirestore.cjs"
+    "seed:firestore": "node scripts/seedFirestore.cjs",
+    "emulators:start": "firebase emulators:start --only firestore,auth",
+    "set:admin": "node scripts/setAdminClaim.cjs"
   },
   "dependencies": {
+    "@hello-pangea/dnd": "^13.1.1",
+    "clsx": "^1.2.1",
     "firebase": "^9.23.0",
     "framer-motion": "^11.0.8",
     "lucide-react": "^0.344.0",
     "react": "^18.2.0",
-    "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.0",
     "recharts": "^2.12.2",
-    "clsx": "^1.2.1"
-    ,"uuid": "^9.0.0"
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "vite": "^5.0.0",
-    "@vitejs/plugin-react": "^4.0.0",
-    "tailwindcss": "^3.5.0",
-    "postcss": "^8.4.0",
-    "autoprefixer": "^10.4.0",
-    "firebase-admin": "^11.11.0"
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.18",
+    "firebase-admin": "^11.11.0",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "vite": "^5.1.6"
   }
 }
