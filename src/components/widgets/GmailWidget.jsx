@@ -6,6 +6,7 @@ import { useToast } from '../../context/ToastContext'
 export default function GmailWidget({ emails = [] }) {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(null)
+  const [loading, setLoading] = useState(false)
   const { showToast } = useToast()
 
   return (
@@ -28,7 +29,14 @@ export default function GmailWidget({ emails = [] }) {
         <div className="text-sm text-slate-700 mb-4">{active ? active.body : null}</div>
         <div className="flex gap-2 justify-end">
           <Button variant="secondary" onClick={() => { setOpen(false); }}>Close</Button>
-          <Button variant="primary" onClick={() => { showToast('Reply sent'); setOpen(false); }}>Reply</Button>
+          <Button variant="primary" loading={loading} onClick={() => {
+            setLoading(true)
+            setTimeout(() => {
+              setLoading(false)
+              showToast('Reply sent', 'success')
+              setOpen(false)
+            }, 1000)
+          }}>Reply</Button>
         </div>
       </Modal>
     </div>
