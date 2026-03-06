@@ -13,7 +13,7 @@
     "set:admin": "node scripts/setAdminClaim.cjs"
   },
   "dependencies": {
-    "@hello-pangea/dnd": "^13.1.1",
+    "@hello-pangea/dnd": "^16.6.0",
     "clsx": "^1.2.1",
     "firebase": "^9.23.0",
     "framer-motion": "^11.0.8",
