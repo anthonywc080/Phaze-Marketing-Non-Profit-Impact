@@ -1,6 +1,7 @@
 import React from 'react'
-import { ToastProvider } from './context/ToastContext'
+import { ToastProvider, useToast } from './context/ToastContext'
 import { RoleProvider, useRole } from './context/RoleContext'
+import { AppProvider } from './context/AppContext'
 import { FirebaseProvider } from './context/FirebaseContext'
 import Button from './components/ui/Button'
 
@@ -20,18 +21,27 @@ const PERSONA_COMPONENTS = {
 
 function TopNav() {
   const { persona, setPersona, personas } = useRole()
-  const { user, signInWithGoogle, signOut } = require('./context/FirebaseContext').useFirebase ? require('./context/FirebaseContext').useFirebase() : { user: null, signInWithGoogle: ()=>{}, signOut: ()=>{} }
-  // Above require trick avoids bundling errors if context isn't ready in some environments.
+  const { user } = require('./context/FirebaseContext').useFirebase ? require('./context/FirebaseContext').useFirebase() : { user: null }
+  const { showToast } = useToast()
   return (
     <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
       <div className="flex items-center gap-4">
         <div className="font-bold text-lg">TaskFlow Pro</div>
         <div className="hidden md:flex items-center gap-2">
-          {personas.map(p => (
-            <button key={p} onClick={() => setPersona(p)} className={`px-3 py-1 rounded-lg text-sm ${persona===p? 'bg-blue-600 text-white':'text-slate-600 bg-slate-100'}`}>
-              {p}
-            </button>
-          ))}
+          {personas.map(p => {
+            const restricted = (p === 'Admin' || p === 'Finance') && !user
+            return (
+              <button
+                key={p}
+                onClick={() => {
+                  if (restricted) return showToast('Sign in required for this view', 'warning')
+                  setPersona(p)
+                }}
+                className={`px-3 py-1 rounded-lg text-sm ${persona===p? 'bg-blue-600 text-white':'text-slate-600 bg-slate-100'} ${restricted ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                {p}
+              </button>
+            )
+          })}
         </div>
       </div>
       <div className="flex items-center gap-3">
@@ -46,7 +56,7 @@ function TopNav() {
 }
 
 function AuthButtons(){
-  // lazy import to avoid circular hooks during module init
+  // direct hook usage (TopNav is inside FirebaseProvider)
   const { useFirebase } = require('./context/FirebaseContext')
   let auth = { user: null, signInWithGoogle: ()=>{}, signOut: ()=>{} }
   try{ auth = useFirebase() }catch(e){}
@@ -74,12 +84,14 @@ export default function App(){
   return (
     <ToastProvider>
       <FirebaseProvider>
-        <RoleProvider>
-          <div className="min-h-screen bg-slate-50 font-sans">
-            <TopNav />
-            <PersonaShell />
-          </div>
-        </RoleProvider>
+        <AppProvider>
+          <RoleProvider>
+            <div className="min-h-screen bg-slate-50 font-sans">
+              <TopNav />
+              <PersonaShell />
+            </div>
+          </RoleProvider>
+        </AppProvider>
       </FirebaseProvider>
     </ToastProvider>
   )
