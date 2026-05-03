@@ -1,17 +1,40 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { auth, googleProvider } from '../firebase/config'
 import { signInWithPopup, onAuthStateChanged, signOut as fbSignOut } from 'firebase/auth'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { db } from '../firebase/config'
 import { useToast } from './ToastContext'
 
 const FirebaseContext = createContext(null)
 
 export function FirebaseProvider({ children }){
   const [user, setUser] = useState(null)
+  const [userProfile, setUserProfile] = useState(null)
   const { showToast } = useToast()
 
   useEffect(()=>{
-    const unsub = onAuthStateChanged(auth, (u)=>{
+    const unsub = onAuthStateChanged(auth, async (u)=>{
       setUser(u)
+      if (u) {
+        // Load or create user profile
+        const userDoc = await getDoc(doc(db, 'users', u.uid))
+        if (userDoc.exists()) {
+          setUserProfile(userDoc.data())
+        } else {
+          // Create new profile - default to student
+          const newProfile = {
+            uid: u.uid,
+            email: u.email,
+            displayName: u.displayName,
+            role: 'student', // default role
+            createdAt: new Date()
+          }
+          await setDoc(doc(db, 'users', u.uid), newProfile)
+          setUserProfile(newProfile)
+        }
+      } else {
+        setUserProfile(null)
+      }
     })
     return unsub
   },[])
@@ -31,7 +54,7 @@ export function FirebaseProvider({ children }){
   }
 
   return (
-    <FirebaseContext.Provider value={{ user, signInWithGoogle, signOut }}>
+    <FirebaseContext.Provider value={{ user, userProfile, signInWithGoogle, signOut }}>
       {children}
     </FirebaseContext.Provider>
   )

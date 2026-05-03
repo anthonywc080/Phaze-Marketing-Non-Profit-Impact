@@ -4,7 +4,7 @@ import { CheckCircle, ExternalLink } from 'lucide-react'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
 
-export default function CampaignCard({ campaign, onClick }) {
+export default function CampaignCard({ campaign, onJoin }) {
   const [isHovered, setIsHovered] = useState(false)
 
   const getCategoryIcon = (category) => {
@@ -68,7 +68,7 @@ export default function CampaignCard({ campaign, onClick }) {
       transition={{ duration: 0.3 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={onClick}
+      onClick={onJoin}
       className="group cursor-pointer"
     >
       <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 h-full">

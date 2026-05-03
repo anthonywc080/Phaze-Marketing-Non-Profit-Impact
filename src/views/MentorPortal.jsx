@@ -1,38 +1,95 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import ZoomWidget from '../components/widgets/ZoomWidget'
 import { useToast } from '../context/ToastContext'
 import { useApp } from '../context/AppContext'
+import { useFirebase } from '../context/FirebaseContext'
 import Input from '../components/ui/Input'
 import Button from '../components/ui/Button'
 
 export default function MentorPortal(){
-  const { students } = useApp()
-  const assigned = students
-  const [hours, setHours] = useState(12)
+  const { students, sessionLogs, addSessionLog } = useApp()
+  const { user } = useFirebase()
+
+  const assigned = useMemo(() => {
+    const mentorId = user?.uid
+    return students.filter(s => s.mentorId === mentorId)
+  }, [students, user])
+
+  const sessions = useMemo(() => {
+    return assigned
+      .filter((s) => s.zoomLink)
+      .map((s) => ({ id: s.id, title: `Session with ${s.name}`, time: s.nextSession || 'Scheduled', url: s.zoomLink }))
+  }, [assigned])
+
+  const [hours, setHours] = useState(0)
 
   const { showToast } = useToast()
   const [inputHours, setInputHours] = useState('')
-  const [selected, setSelected] = useState(students[0]?.id || '')
+  const [selected, setSelected] = useState('')
   const [notes, setNotes] = useState('')
   const [loadingId, setLoadingId] = useState(null)
 
-  function logHours(n){
+  useEffect(() => {
+    if (assigned.length > 0) {
+      setSelected((prev) => prev || assigned[0].id)
+    }
+  }, [assigned])
+
+  useEffect(() => {
+    const mentorId = user?.uid
+    if (!mentorId) return
+    const total = sessionLogs
+      .filter((log) => log.mentorId === mentorId)
+      .reduce((sum, log) => sum + Number(log.hours || 0), 0)
+    setHours(total)
+  }, [sessionLogs, user])
+
+  async function logHours(n){
     const num = Number(n)
     if (!num || num <= 0) {
       showToast('Enter a valid number of hours', 'warning')
       return
     }
-    setHours(h=>h + num)
-    setInputHours('')
-    setNotes('')
-    showToast('Hours logged', 'success')
+    if (!selected) {
+      showToast('Select a student first', 'warning')
+      return
+    }
+    const student = assigned.find((s) => s.id === selected)
+    if (!student) {
+      showToast('Selected student is not on your roster', 'danger')
+      return
+    }
+
+    try {
+      await addSessionLog({
+        mentorId: user?.uid,
+        studentId: student.id,
+        notes: notes.trim(),
+        hours: num,
+        createdAt: new Date()
+      })
+      setInputHours('')
+      setNotes('')
+      showToast('Hours logged to student session', 'success')
+    } catch (e) {
+      showToast('Failed to log hours', 'danger')
+    }
   }
 
   function startSession(sId){
+    const student = assigned.find((s) => s.id === sId)
+    if (!student) {
+      showToast('Unable to start session for unassigned student', 'danger')
+      return
+    }
     setLoadingId(sId)
+
     setTimeout(()=>{
       setLoadingId(null)
       showToast('Session started', 'success')
+      if (student.zoomLink) {
+        window.open(student.zoomLink, '_blank')
+      }
     }, 1200)
   }
 
@@ -73,7 +130,11 @@ export default function MentorPortal(){
               <div>
                 <label className="block text-sm text-slate-700 mb-1">Select Student</label>
                 <select value={selected} onChange={(e)=> setSelected(e.target.value)} className="w-full p-2 border rounded-lg">
-                  {students.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  {assigned.length === 0 ? (
+                    <option value="">No assigned students</option>
+                  ) : (
+                    assigned.map(s => <option key={s.id} value={s.id}>{s.name}</option>)
+                  )}
                 </select>
               </div>
               <div>
@@ -88,7 +149,7 @@ export default function MentorPortal(){
         </div>
 
         <div className="space-y-4">
-          <ZoomWidget sessions={[]} />
+          <ZoomWidget sessions={sessions} />
         </div>
       </div>
     </div>

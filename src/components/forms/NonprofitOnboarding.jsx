@@ -224,13 +224,12 @@ export default function NonprofitOnboarding() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4 md:p-8">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Phaze Nonprofit Onboarding</h1>
-          <p className="text-slate-400">Step {step} of 4: {step === 1 ? 'Organization Details' : step === 2 ? 'Point of Contact' : step === 3 ? 'Reward Settings' : 'Review & Submit'}</p>
-        </div>
+    <div className="w-full max-w-2xl mx-auto">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Phaze Nonprofit Onboarding</h1>
+        <p className="text-slate-500">Step {step} of 4: {step === 1 ? 'Organization Details' : step === 2 ? 'Point of Contact' : step === 3 ? 'Reward Settings' : 'Review & Submit'}</p>
+      </div>
 
         {/* Progress Bar */}
         <div className="mb-8 flex gap-2">

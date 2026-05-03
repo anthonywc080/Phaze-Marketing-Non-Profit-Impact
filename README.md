@@ -1,6 +1,6 @@
-# TaskFlow Pro - Nonprofit Operating System
+# Phaze Marketing Platform - Nonprofit Operating System
 
-TaskFlow Pro is a comprehensive React-based command center designed for nonprofits, featuring 5 distinct persona dashboards to streamline operations, student management, mentoring, finance oversight, and super admin controls. Built with modern web technologies for scalability and user experience.
+Phaze is a comprehensive React-based command center designed for nonprofits, featuring 5 distinct persona dashboards to streamline operations, student management, mentoring, finance oversight, and super admin controls. Built with modern web technologies for scalability and user experience.
 
 ## Features
 
@@ -31,7 +31,7 @@ TaskFlow Pro is a comprehensive React-based command center designed for nonprofi
 - **Styling**: Tailwind CSS
 - **Backend**: Firebase (Auth, Firestore)
 - **Libraries**: @hello-pangea/dnd (drag-and-drop), Lucide React (icons), Recharts (charts), Framer Motion (animations), React Router DOM (routing)
-- **Tools**: ESLint, PostCSS, Firebase Admin SDK
+- **Tools**: PostCSS, Firebase Admin SDK (for seed scripts)
 
 ## Setup Instructions
 
@@ -87,12 +87,12 @@ TaskFlow Pro is a comprehensive React-based command center designed for nonprofi
 
 3. Seed the database with sample data:
    ```bash
-   npm run emulators:seed
+   npm run seed:firestore
    ```
 
 4. Claim admin role (for testing):
    ```bash
-   npm run emulators:admin
+   npm run set:admin
    ```
 
 ### Building for Production
@@ -105,16 +105,13 @@ The build artifacts will be stored in the `dist/` directory.
 
 ### Deployment
 
-This project is configured for deployment on Netlify:
+This project is deployed on Netlify:
 
 - Build command: `npm run build`
 - Publish directory: `dist`
 - Environment variables: Set the VITE_FIREBASE_* variables in Netlify's environment settings.
 
-For Firebase hosting:
-```bash
-firebase deploy
-```
+Connect your repository to Netlify and it will automatically deploy on every push to main.
 
 ## Project Structure
 

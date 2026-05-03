@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ToastProvider, useToast } from './context/ToastContext'
 import { RoleProvider, useRole } from './context/RoleContext'
 import { AppProvider } from './context/AppContext'
@@ -10,6 +10,10 @@ import StudentPortal from './views/StudentPortal'
 import MentorPortal from './views/MentorPortal'
 import FinanceDirector from './views/FinanceDirector'
 import SuperAdmin from './views/SuperAdmin'
+import PlatformSidebar from './components/features/PlatformSidebar'
+import HelpGuideModal from './components/features/HelpGuideModal'
+import ScheduleCallModal from './components/features/ScheduleCallModal'
+import SettingsModal from './components/features/SettingsModal'
 
 const PERSONA_COMPONENTS = {
   NonprofitOps,
@@ -74,13 +78,23 @@ function PersonaShell(){
   const { persona } = useRole()
   const C = PERSONA_COMPONENTS[persona] || (()=> <div/> )
   return (
-    <main className="p-6 overflow-y-auto h-[calc(100vh-64px)]">
+    <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-64px)]">
       <C />
     </main>
   )
 }
 
 export default function App(){
+  const [guideOpen, setGuideOpen] = useState(false)
+  const [callOpen, setCallOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+
+  const handleSidebarAction = (action) => {
+    if (action === 'guide') setGuideOpen(true)
+    if (action === 'call') setCallOpen(true)
+    if (action === 'settings') setSettingsOpen(true)
+  }
+
   return (
     <ToastProvider>
       <FirebaseProvider>
@@ -88,7 +102,13 @@ export default function App(){
           <RoleProvider>
             <div className="min-h-screen bg-slate-50 font-sans">
               <TopNav />
-              <PersonaShell />
+              <div className="flex">
+                <PlatformSidebar onAction={handleSidebarAction} />
+                <PersonaShell />
+              </div>
+              <HelpGuideModal open={guideOpen} onClose={() => setGuideOpen(false)} />
+              <ScheduleCallModal open={callOpen} onClose={() => setCallOpen(false)} />
+              <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
             </div>
           </RoleProvider>
         </AppProvider>
